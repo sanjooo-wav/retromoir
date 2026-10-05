@@ -8,7 +8,6 @@ type PaperStyle = "lined" | "plain";
 type Letter = { id: string; title: string; body: string; month: string; kind: "monthly" | "little"; author: "sander" | "cristine"; attachmentUrl?: string; theme?: Theme; paperStyle?: PaperStyle; signOff?: string; createdAt: string };
 
 export default function Home() {
-  const [colorMode, setColorMode] = useState<"dark" | "light">("dark");
   const [letters, setLetters] = useState<Letter[]>([]);
   const [selectedLetter, setSelectedLetter] = useState<Letter | null>(null);
   const [note, setNote] = useState("");
@@ -35,10 +34,6 @@ export default function Home() {
     fetch("/api/author").then((response) => response.json()).then((data) => { setWriter(data.author); setIsAuthor(Boolean(data.author)); }).catch(() => setLoginMessage("Author access is unavailable right now."));
     fetch("/api/letters").then((response) => response.ok ? response.json() : Promise.reject()).then((data) => setLetters(data)).catch(() => setNotice("Letters are not available yet."));
   }, []);
-
-  function toggleColorMode() {
-    setColorMode((current) => { const next = current === "dark" ? "light" : "dark"; window.localStorage.setItem("memoir-color-mode", next); return next; });
-  }
 
   const monthlyLetters = useMemo(() => letters.filter((letter) => letter.kind === "monthly"), [letters]);
   const sanderLetters = useMemo(() => letters.filter((letter) => letter.author === "sander"), [letters]);
@@ -102,8 +97,8 @@ export default function Home() {
     setTitle(""); setNote(""); setAttachment(null); setTheme("apricot"); setPaperStyle("lined"); setSignOff(""); setNotice("Your letter has been placed in the drawer.");
   }
 
-  return <main data-mode={colorMode}>
-    <nav className="topbar" aria-label="Primary navigation"><a className="wordmark" href="#top">for her, always</a><div><a href="#letters">letters</a><a href="#author">write</a><button className="mode-toggle" type="button" onClick={toggleColorMode} aria-label={`Switch to ${colorMode === "dark" ? "light" : "dark"} mode`}>{colorMode === "dark" ? "light" : "night"}</button></div></nav>
+  return <main data-mode="dark">
+    <nav className="topbar" aria-label="Primary navigation"><a className="wordmark" href="#top">for her, always</a><div><a href="#letters">letters</a><a href="#author">write</a></div></nav>
 
     <section id="top" className="hero" aria-labelledby="hero-title">
       <div className="hero-copy"><p className="eyebrow">A small archive of us</p><h1 id="hero-title">Things I wanted<br />you to keep.</h1><p>Letters for our monthsaries, quiet little thoughts, and all the moments I never want to lose in the noise.</p><a className="text-link" href="#letters">open the letter drawer</a></div>
@@ -125,6 +120,7 @@ export default function Home() {
     <footer><p>an archive made for two.</p><a href="#top">back to the beginning</a></footer>
   </main>;
 }
+
 
 
 
